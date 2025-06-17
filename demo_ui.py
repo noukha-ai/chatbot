@@ -2,8 +2,7 @@ import gradio as gr
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-import vertexai
-from vertexai.generative_models import GenerativeModel
+import google.generativeai as genai
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from langchain_core.documents import Document
@@ -24,9 +23,7 @@ load_dotenv()
 QDRANT_COLLECTION_NAME = "all_tasks_data"
 QDRANT_VECTOR_SIZE = 384
 SENTENCE_TRANSFORMER_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-VERTEX_AI_PROJECT = "prj-cognisaas-prod-app"
-VERTEX_AI_LOCATION = "us-central1"
-VERTEX_AI_MODEL = "gemini-2.0-flash-001"
+GEMINI_MODEL = "gemini-2.0-flash"  # Updated to Gemini model name
 SEARCH_DEFAULT_K = 15
 SEARCH_MAX_QUERY_VARIATIONS = 5
 SEARCH_MAX_UNIQUE_DOCS = 20
@@ -522,25 +519,28 @@ class ResponseGenerator:
     def __init__(self):
         self.model = self._initialize_model()
     
-    def _initialize_model(self) -> GenerativeModel:
-        """Initialize Vertex AI model"""
-        vertexai.init(
-            project=VERTEX_AI_PROJECT,
-            location=VERTEX_AI_LOCATION
-        )
-        return GenerativeModel(VERTEX_AI_MODEL)
-    
-    def generate_response(self, prompt: str) -> str:
-        """Generate response using Vertex AI"""
+    def _initialize_model(self):
+        """Initialize Gemini API model"""
         try:
-            response = self.model.generate_content(
-                contents=prompt,
+            genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+            model = genai.GenerativeModel(
+                model_name=GEMINI_MODEL,
                 generation_config={
                     "temperature": GENERATION_TEMPERATURE,
                     "top_p": GENERATION_TOP_P,
                     "top_k": GENERATION_TOP_K
                 }
             )
+            logger.info(f"Successfully initialized Gemini model {GEMINI_MODEL}")
+            return model
+        except Exception as e:
+            logger.error(f"Error initializing Gemini model: {e}")
+            raise
+    
+    def generate_response(self, prompt: str) -> str:
+        """Generate response using Gemini API"""
+        try:
+            response = self.model.generate_content(prompt)
             return response.text.strip()
         except Exception as e:
             logger.error(f"Error generating response: {e}")
@@ -621,7 +621,7 @@ class ProjectChatbot:
     
     def _validate_environment(self):
         """Validate required environment variables"""
-        required_env_vars = ['QDRANT_URL', 'QDRANT_API_KEY', 'GOOGLE_APPLICATION_CREDENTIALS']
+        required_env_vars = ['QDRANT_URL', 'QDRANT_API_KEY', 'GEMINI_API_KEY']
         missing_vars = [var for var in required_env_vars if not os.getenv(var)]
         
         if missing_vars:

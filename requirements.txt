@@ -10,3 +10,4 @@ sentence-transformers
 google-generativeai
 gradio
 dotenv
+torch

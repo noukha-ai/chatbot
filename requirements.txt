@@ -1,0 +1,9 @@
+python-dotenv
+google-cloud-aiplatform
+qdrant-client
+langchain-core
+transformers
+torch
+mysql-connector-python
+pandas
+sentence-transformers

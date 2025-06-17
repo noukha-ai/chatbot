@@ -1,0 +1,74 @@
+qdrant:
+  collection_name: all_clients_data
+  vector_size: 384
+  batch_size: 10
+
+embeddings:
+  sentence_transformer_model: sentence-transformers/all-MiniLM-L6-v2
+
+vertex_ai:
+  project: prj-cognisaas-prod-app
+  location: us-central1
+  model: gemini-2.0-flash-001
+
+search:
+  default_k: 10
+  max_query_variations: 3
+  max_unique_docs: 10
+
+generation:
+  temperature: 0.2
+  top_p: 0.8
+  top_k: 40
+  max_output_tokens: 512
+
+database_fields:
+  - client_id
+  - client_name
+  - client_stage_id
+  - client_industry_id
+  - client_sales_owner_id
+  - client_cs_owner_id
+  - client_recurring_revenue
+  - client_cs_owner
+  - client_sales_owner
+  - project_id
+  - project_name
+  - project_description
+  - project_stage_id
+  - project_priority_id
+  - project_planned_start
+  - project_planned_end
+  - project_actual_start
+  - project_actual_end
+  - project_delivery_manager_id
+  - project_delivery_manager
+  - usecase_id
+  - usecase_name
+  - usecase_description
+  - usecase_stage_id
+  - usecase_priority_id
+  - usecase_planned_start
+  - usecase_planned_end
+  - usecase_actual_start
+  - usecase_actual_end
+  - usecase_delivery_manager_id
+  - usecase_delivery_manager
+  - phase_id
+  - phase_name
+  - task_id
+  - task_name
+  - task_description
+  - task_stage_id
+  - task_priority_id
+  - task_planned_start
+  - task_planned_end
+  - task_actual_start
+  - task_actual_end
+  - task_owner_id
+  - task_owner
+  - custom_fields
+
+logging:
+  file: chatbot.log
+  level: INFO

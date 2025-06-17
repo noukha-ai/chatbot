@@ -7,3 +7,4 @@ torch
 mysql-connector-python
 pandas
 sentence-transformers
+google-generativeai
